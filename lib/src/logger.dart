@@ -11,7 +11,7 @@ class Logger {
 
   void warn(msg, [String? module]) => _print(msg, Level.warn, module);
 
-  void error(msg, [StackTrace? stackTrace, String? module]) => _print('$msg\n$stackTrace', Level.error, module);
+  void error(msg, [StackTrace? stackTrace, String? module]) => _print('$msg${stackTrace == null ? '' : '\n$stackTrace'}', Level.error, module);
 
   void debug(msg, [String? module]) => _print(msg, Level.debug, module);
 
