@@ -7,4 +7,11 @@ void main() {
   logger.warn('this is warn');
   logger.error('this is error');
   logger.debug('this is debug');
+
+  try {
+    final list = [];
+    list[2];
+  } catch (e, st) {
+    logger.error(e, st);
+  }
 }
