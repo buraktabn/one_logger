@@ -1,3 +1,7 @@
+## 1.0.0+3
+
+- Added `copyWith` method to `Logger`.
+
 ## 1.0.0+2
 
 - Fixed a issue where `StackTrace` prints null when not provided.

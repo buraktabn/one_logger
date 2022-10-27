@@ -11,11 +11,15 @@ class Logger {
 
   void warn(msg, [String? module]) => _print(msg, Level.warn, module);
 
-  void error(msg, [StackTrace? stackTrace, String? module]) => _print('$msg${stackTrace == null ? '' : '\n$stackTrace'}', Level.error, module);
+  void error(msg, [StackTrace? stackTrace, String? module]) =>
+      _print('$msg${stackTrace == null ? '' : '\n$stackTrace'}', Level.error, module);
 
   void debug(msg, [String? module]) => _print(msg, Level.debug, module);
 
   void _print(msg, Level level, [String? module]) {
     ansiPrint(msg, level: level, module: module ?? this.module, options: options);
   }
+
+  Logger copyWith({String? module, LoggerOptions? options}) =>
+      Logger(module: module ?? this.module, options: options ?? this.options);
 }
