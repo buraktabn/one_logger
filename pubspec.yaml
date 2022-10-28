@@ -1,6 +1,6 @@
 name: one_logger
 description: Single line logger. [date level module msg]
-version: 1.0.0+3
+version: 1.0.1+1
 repository: https://github.com/buraktabn/one_logger
 issue_tracker: https://github.com/buraktabn/one_logger/issues
 
@@ -8,6 +8,7 @@ environment:
   sdk: '>=2.18.2 <3.0.0'
 
 dependencies:
+  dio: ^4.0.6
   equatable: ^2.0.5
   intl: ^0.17.0
   tuple: ^2.0.1

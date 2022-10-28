@@ -13,12 +13,14 @@ and the Flutter guide for
 
 ## Features
 
-List what your package can do. Maybe include images, gifs, or videos.
+Simple logger with ansi support.
 
-## Getting started
-
-List prerequisites and provide or point to information on how to
-start using the package.
+```
+[2022-10-27 02:58:28.172]  INFO blockchain: this is info
+[2022-10-27 02:58:28.191]  WARN blockchain: this is warn
+[2022-10-27 02:58:28.191] ERROR blockchain: this is error
+[2022-10-27 02:58:28.191] DEBUG blockchain: this is debug
+```
 
 ## Usage
 
