@@ -22,11 +22,14 @@ enum Level {
       }
     }
     final diff = max - name.length;
-    if (diff > 0) {
-      return List.filled(diff, ' ').join() + name.toUpperCase();
-    }
-    return name.toUpperCase();
+    // if (diff > 0) {
+    //   return List.filled(diff, ' ').join() + name.toUpperCase();
+    // }
+    return name.toUpperCase().padLeft(diff);
   }
+
+  @override
+  String toString() => toEqualSizeText();
 }
 
 class LoggerOptions extends Equatable {

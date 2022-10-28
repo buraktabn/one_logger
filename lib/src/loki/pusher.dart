@@ -44,9 +44,9 @@ Future<void> _push(String lokiUrl, PushPayload payload) async {
       throw Exception(res.data);
     }
   } on DioError catch (err, st) {
-    Logger().error(err, st, 'loki-push');
+    Logger().error(err, stackTrace: st, module: 'loki-push');
   } catch (error, st) {
-    Logger().error(error, st, 'loki-push');
+    Logger().error(error, stackTrace: st, module: 'loki-push');
     rethrow;
   }
 }

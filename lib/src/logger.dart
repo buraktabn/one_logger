@@ -7,6 +7,10 @@ import 'package:tuple/tuple.dart';
 import 'helper.dart';
 import 'options/options.dart';
 
+typedef LokiLabel = Map<String, String>;
+
+const _level = 'level';
+
 late final SendPort _sendPort;
 
 class Logger {
@@ -17,6 +21,7 @@ class Logger {
   final LoggerOptions options;
 
   bool get lokiEnabled => lokiUrl != null;
+
   String get _loggerModuleName {
     if (module == null) {
       return 'logger';
@@ -24,28 +29,36 @@ class Logger {
     return '$module:logger';
   }
 
-  void info(msg, [String? module]) => _print(msg, Level.info, module);
+  void info(msg, {String? module, LokiLabel? labels}) =>
+      _print(msg, Level.info, module, {_level: Level.info.toString(), ...?labels});
 
-  void warn(msg, [String? module]) => _print(msg, Level.warn, module);
+  void warn(msg, {String? module, LokiLabel? labels}) =>
+      _print(msg, Level.warn, module, {_level: Level.warn.toString(), ...?labels});
 
-  void error(msg, [StackTrace? stackTrace, String? module]) =>
-      _print('$msg${stackTrace == null ? '' : '\n$stackTrace'}', Level.error, module);
+  void error(msg, {StackTrace? stackTrace, String? module, LokiLabel? labels}) => _print(
+      '$msg${stackTrace == null ? '' : '\n$stackTrace'}',
+      Level.error,
+      module,
+      {_level: Level.error.toString(), ...?labels});
 
-  void debug(msg, [String? module]) => _print(msg, Level.debug, module);
+  void debug(msg, {String? module, LokiLabel? labels}) =>
+      _print(msg, Level.debug, module, {_level: Level.debug.toString(), ...?labels});
 
-  void _print(msg, Level level, [String? module]) {
+  void _print(msg, Level level, [String? module, LokiLabel? labels]) {
     final log = ansiPrint(msg, level: level, module: module ?? this.module, options: options);
     if (lokiEnabled) {
-      final val = Tuple2([log], module ?? this.module ?? Platform.localHostname);
+      final val = Tuple3([log], module ?? this.module ?? Platform.localHostname, labels);
       try {
         _sendPort.send(val);
       } catch (_) {
-        warn('Loki is not yet active or disposed.', _loggerModuleName);
-        warn('Trying to restart it', _loggerModuleName);
+        final logger = copyWith(module: _loggerModuleName);
+        logger.warn('Loki is not yet active or disposed.');
+        logger.warn('Trying to restart it');
         try {
           startLoki().then((_) => _sendPort.send(val));
         } catch (_) {
-          error('Loki retry failed. This should be reported', null, _loggerModuleName);
+          logger.error(
+              'Loki retry failed. This should be reported. https://github.com/buraktabn/one_logger/issues');
         }
       }
     }
@@ -53,7 +66,7 @@ class Logger {
 
   Future<void> startLoki() async {
     if (!lokiEnabled) {
-      warn('Loki URL not configured');
+      copyWith(module: _loggerModuleName).warn('Loki URL not configured');
       return;
     }
     final receiverPort = ReceivePort();
@@ -62,7 +75,7 @@ class Logger {
 
     try {
       _sendPort = await receiverPort.first;
-    } catch(_) {
+    } catch (_) {
       isolate.kill();
     }
   }

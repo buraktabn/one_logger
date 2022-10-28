@@ -14,7 +14,7 @@ void main() async {
     final list = [];
     list[2];
   } catch (e, st) {
-    logger.error(e, st);
+    logger.error(e, stackTrace: st);
   }
 
   await Future.delayed(const Duration(milliseconds: 500));

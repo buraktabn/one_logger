@@ -1,7 +1,18 @@
+## 1.0.2+1
+
+- Added `level` label to `Logger` methods
+
+## 1.0.2
+
+- Introduced optional `labels` for Grafana Loki
+
+## 1.0.1+2
+
+- Fixed a bug that causes StackOverFlow
+
 ## 1.0.1+1
 
 - Loki push retry on fail
-- 
 
 ## 1.0.1
 
