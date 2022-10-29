@@ -1,3 +1,8 @@
+## 1.0.2+3
+
+- Implemented batch logs
+- Introduced `LokiOptions` to configure batch settings
+
 ## 1.0.2+2
 
 - Fixed a bug

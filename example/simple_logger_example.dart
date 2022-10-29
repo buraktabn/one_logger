@@ -1,11 +1,20 @@
 import 'package:one_logger/one_logger.dart';
 
 void main() async {
-  final logger = Logger(module: 'one_logger', lokiUrl: 'http://morhpt.sv:3100/loki/api/v1/push');
+  final logger = Logger(
+    module: 'one_logger',
+    lokiOptions: LokiOptions(lokiUrl: 'http://morhpt.sv:3100/loki/api/v1/push'),
+  );
+  final batchLogger = logger.copyWith(
+    lokiOptions: LokiOptions(
+      lokiUrl: 'http://morhpt.sv:3100/loki/api/v1/push',
+      batchEvery: Duration(seconds: 5),
+    ),
+  );
 
   await logger.startLoki();
+  await batchLogger.startLoki();
 
-  logger.info('this is info');
   logger.warn('this is warn');
   logger.error('this is error');
   logger.debug('this is debug');
@@ -17,6 +26,12 @@ void main() async {
     logger.error(e, stackTrace: st);
   }
 
-  await Future.delayed(const Duration(milliseconds: 500));
+  for (final i in List.generate(100, (index) => index)) {
+    batchLogger.info('$i this is info from batch');
+
+    await Future.delayed(const Duration(milliseconds: 100));
+  }
+
   logger.disposeLoki();
+  batchLogger.disposeLoki();
 }

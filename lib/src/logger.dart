@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:equatable/equatable.dart';
+import 'package:one_logger/src/loki/options.dart';
 import 'package:one_logger/src/loki/pusher.dart';
 import 'package:tuple/tuple.dart';
 
@@ -11,16 +13,16 @@ typedef LokiLabel = Map<String, String>;
 
 const _level = 'level';
 
-late final SendPort _sendPort;
+final _sendPorts = <LokiOptions, SendPort>{};
 
-class Logger {
-  const Logger({this.module, this.lokiUrl, this.options = defaultLevelOptions});
+class Logger extends Equatable {
+  const Logger({this.module, this.lokiOptions, this.options = defaultLevelOptions});
 
   final String? module;
-  final String? lokiUrl;
+  final LokiOptions? lokiOptions;
   final LoggerOptions options;
 
-  bool get lokiEnabled => lokiUrl != null;
+  bool get lokiEnabled => lokiOptions != null;
 
   String get _loggerModuleName {
     if (module == null) {
@@ -46,16 +48,21 @@ class Logger {
 
   void _print(msg, Level level, [String? module, LokiLabel? labels]) {
     final log = ansiPrint(msg, level: level, module: module ?? this.module, options: options);
+    Tuple3<List<String>, String, LokiLabel?>? val;
+    void send() {
+      val ??= Tuple3([log], module ?? this.module ?? Platform.localHostname, labels);
+      _sendPorts[lokiOptions!]!.send(val);
+    }
+
     if (lokiEnabled) {
-      final val = Tuple3([log], module ?? this.module ?? Platform.localHostname, labels);
       try {
-        _sendPort.send(val);
+        send();
       } catch (_) {
         final logger = Logger(module: _loggerModuleName, options: options);
         logger.warn('Loki is not yet active or disposed.');
         logger.warn('Trying to restart it');
         try {
-          startLoki().then((_) => _sendPort.send(val));
+          startLoki().then((_) => send());
         } catch (_) {
           logger.error(
               'Loki retry failed. This should be reported. https://github.com/buraktabn/one_logger/issues');
@@ -70,20 +77,31 @@ class Logger {
       return;
     }
     final receiverPort = ReceivePort();
-    final isolate = await Isolate.spawn(pushIsolate, Tuple2(receiverPort.sendPort, lokiUrl!),
+    final isolate = await Isolate.spawn(pushIsolate, Tuple2(receiverPort.sendPort, lokiOptions!),
         debugName: 'Grafana Loki Pusher');
 
     try {
-      _sendPort = await receiverPort.first;
+      final sendPort = await receiverPort.first;
+      if (!_sendPorts.containsKey(lokiOptions)) {
+        _sendPorts[lokiOptions!] = sendPort;
+      }
     } catch (_) {
       isolate.kill();
     }
   }
 
   void disposeLoki() {
-    _sendPort.send('exit');
+    _sendPorts[lokiOptions!]!.send('exit');
   }
 
-  Logger copyWith({String? module, LoggerOptions? options}) =>
-      Logger(module: module ?? this.module, options: options ?? this.options);
+  Logger copyWith({String? module, LoggerOptions? options, LokiOptions? lokiOptions}) => Logger(
+      module: module ?? this.module,
+      options: options ?? this.options,
+      lokiOptions: lokiOptions ?? this.lokiOptions);
+
+  @override
+  List<Object?> get props => [module, options, lokiOptions];
+
+  @override
+  bool? get stringify => true;
 }

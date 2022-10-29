@@ -7,3 +7,4 @@ export 'src/logger.dart';
 export 'src/helper.dart' hide dateFormat;
 export 'src/options/options.dart';
 export 'src/options/style.dart';
+export 'src/loki/options.dart';
