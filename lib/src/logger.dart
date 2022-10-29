@@ -51,7 +51,7 @@ class Logger {
       try {
         _sendPort.send(val);
       } catch (_) {
-        final logger = copyWith(module: _loggerModuleName);
+        final logger = Logger(module: _loggerModuleName, options: options);
         logger.warn('Loki is not yet active or disposed.');
         logger.warn('Trying to restart it');
         try {
@@ -66,7 +66,7 @@ class Logger {
 
   Future<void> startLoki() async {
     if (!lokiEnabled) {
-      copyWith(module: _loggerModuleName).warn('Loki URL not configured');
+      Logger(module: _loggerModuleName, options: options).warn('Loki URL not configured');
       return;
     }
     final receiverPort = ReceivePort();

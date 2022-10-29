@@ -1,3 +1,7 @@
+## 1.0.2+2
+
+- Fixed a bug
+
 ## 1.0.2+1
 
 - Added `level` label to `Logger` methods

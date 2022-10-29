@@ -13,7 +13,6 @@ void pushIsolate(Tuple2<SendPort, String> payload) {
   receivePort.listen((val) async {
     if (val == 'exit') {
       do {
-        print(jobs);
         if (jobs == 0) {
           Isolate.exit();
         }
@@ -23,12 +22,12 @@ void pushIsolate(Tuple2<SendPort, String> payload) {
     }
     try {
       ++jobs;
-      final msg = val as Tuple2<List<String>, String>;
-      final pushPayload = PushPayload(streams: {'service': msg.item2}, logs: msg.item1);
+      final msg = val as Tuple3<List<String>, String, LokiLabel?>;
+      final pushPayload = PushPayload(streams: {'service': msg.item2, ...?msg.item3}, logs: msg.item1);
       await _push(payload.item2, pushPayload);
       --jobs;
     } catch (_) {
-      --jobs;
+      // --jobs;
     }
   });
 }

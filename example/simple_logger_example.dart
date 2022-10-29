@@ -1,7 +1,7 @@
 import 'package:one_logger/one_logger.dart';
 
 void main() async {
-  final logger = Logger(module: 'blockchain', lokiUrl: 'http://morhpt.sv:3100/loki/api/v1/push');
+  final logger = Logger(module: 'one_logger', lokiUrl: 'http://morhpt.sv:3100/loki/api/v1/push');
 
   await logger.startLoki();
 
