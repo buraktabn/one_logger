@@ -1,3 +1,8 @@
+## 1.0.3
+
+- Introduced `service` and `module`
+- Added style constructors to `LogStyle` style logs easily. (Made chatGPT do it. lol)
+
 ## 1.0.2+3
 
 - Implemented batch logs

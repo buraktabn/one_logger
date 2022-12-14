@@ -2,7 +2,8 @@ import 'package:one_logger/one_logger.dart';
 
 void main() async {
   final logger = Logger(
-    module: 'one_logger',
+    service: 'one_logger',
+    defaultModule: 'example',
     lokiOptions: LokiOptions(lokiUrl: 'http://morhpt.sv:3100/loki/api/v1/push'),
   );
   final batchLogger = logger.copyWith(

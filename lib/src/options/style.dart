@@ -28,6 +28,45 @@ class LogStyle extends Equatable {
 
   const LogStyle({this.textColor, this.backgroundColor, this.attr = Attribute.resetAll});
 
+  const LogStyle.textBlack({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorBlack;
+
+  const LogStyle.textRed({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorRed;
+
+  const LogStyle.textGreen({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorGreen;
+
+  const LogStyle.textYellow({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorYellow;
+
+  const LogStyle.textBlue({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorBlue;
+
+  const LogStyle.textMagenta({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorMagenta;
+
+  const LogStyle.textCyan({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorCyan;
+
+  const LogStyle.textWhite({this.backgroundColor, this.attr = Attribute.resetAll}) : textColor = textColorWhite;
+
+  const LogStyle.backgroundBlack({this.textColor, this.attr = Attribute.resetAll})
+      : backgroundColor = backgroundColorBlack;
+
+  const LogStyle.backgroundRed({this.textColor, this.attr = Attribute.resetAll}) : backgroundColor = backgroundColorRed;
+
+  const LogStyle.backgroundGreen({this.textColor, this.attr = Attribute.resetAll})
+      : backgroundColor = backgroundColorGreen;
+
+  const LogStyle.backgroundYellow({this.textColor, this.attr = Attribute.resetAll})
+      : backgroundColor = backgroundColorYellow;
+
+  const LogStyle.backgroundBlue({this.textColor, this.attr = Attribute.resetAll})
+      : backgroundColor = backgroundColorBlue;
+
+  const LogStyle.backgroundMagenta({this.textColor, this.attr = Attribute.resetAll})
+      : backgroundColor = backgroundColorMagenta;
+
+  const LogStyle.backgroundCyan({this.textColor, this.attr = Attribute.resetAll})
+      : backgroundColor = backgroundColorCyan;
+
+  const LogStyle.backgroundWhite({this.textColor, this.attr = Attribute.resetAll})
+      : backgroundColor = backgroundColorWhite;
+
   @override
   List<Object?> get props => [textColor, backgroundColor, attr];
 

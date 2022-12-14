@@ -9,7 +9,7 @@ import 'package:one_logger/src/options/style.dart';
 
 const defaultLevelOptions = LoggerOptions();
 
-final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss.S');
+final defaultDateFormat = DateFormat('yyyy-MM-dd HH:mm:ss.S');
 
 String textToAnsi(text, {LogStyle style = const LogStyle()}) {
   // if (!supportsAnsiColor) {
@@ -23,15 +23,19 @@ String textToAnsi(text, {LogStyle style = const LogStyle()}) {
 String ansiPrint(msg,
     {DateTime? date,
     Level level = Level.debug,
+    String? service,
     String? module,
+      DateFormat? dateFormat,
     LoggerOptions options = defaultLevelOptions}) {
-  module ??= Platform.localHostname;
+  service ??= Platform.localHostname;
+  dateFormat ??= defaultDateFormat;
   date ??= DateTime.now();
-  final mModule = textToAnsi('$module:', style: options.module);
+  final mService = textToAnsi(service, style: options.service);
+  final mModule = module == null ? '' : ':${textToAnsi(module, style: options.module)}';
   final mDate = textToAnsi('[${dateFormat.format(date)}]', style: options.date);
   final levelStyle = level.logStyleFromOptions(options);
   final mLevel = textToAnsi(levelStyle.item1, style: levelStyle.item2);
-  final log = '$mDate $mLevel $mModule $msg';
+  final log = '$mDate $mLevel $mService$mModule $msg';
   print(log);
   return log;
   // date, level, module, msg

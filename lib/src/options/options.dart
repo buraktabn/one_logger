@@ -22,10 +22,10 @@ enum Level {
       }
     }
     final diff = max - name.length;
-    // if (diff > 0) {
-    //   return List.filled(diff, ' ').join() + name.toUpperCase();
-    // }
-    return name.toUpperCase().padLeft(diff);
+    if (diff > 0) {
+      return List.filled(diff, ' ').join() + name.toUpperCase();
+    }
+    return name.toUpperCase();
   }
 
   @override
@@ -38,6 +38,7 @@ class LoggerOptions extends Equatable {
   final LogStyle error;
   final LogStyle debug;
   final LogStyle module;
+  final LogStyle service;
   final LogStyle date;
 
   const LoggerOptions({
@@ -46,6 +47,7 @@ class LoggerOptions extends Equatable {
     this.error = const LogStyle(textColor: textColorRed, attr: Attribute.reverse),
     this.debug = const LogStyle(),
     this.module = const LogStyle(textColor: textColorCyan),
+    this.service = const LogStyle(textColor: textColorCyan),
     this.date = const LogStyle(attr: Attribute.dim),
   });
 
@@ -59,7 +61,7 @@ class LoggerOptions extends Equatable {
   }
 
   @override
-  List<Object?> get props => [info, warn, error, debug];
+  List<Object?> get props => [info, warn, error, debug, module, service, date];
 
   @override
   bool? get stringify => true;

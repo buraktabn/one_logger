@@ -16,19 +16,20 @@ const _level = 'level';
 final _sendPorts = <LokiOptions, SendPort>{};
 
 class Logger extends Equatable {
-  const Logger({this.module, this.lokiOptions, this.options = defaultLevelOptions});
+  const Logger({this.service, this.defaultModule, this.lokiOptions, this.options = defaultLevelOptions});
 
-  final String? module;
+  final String? service;
+  final String? defaultModule;
   final LokiOptions? lokiOptions;
   final LoggerOptions options;
 
   bool get lokiEnabled => lokiOptions != null;
 
-  String get _loggerModuleName {
-    if (module == null) {
+  String get _loggerServiceName {
+    if (service == null) {
       return 'logger';
     }
-    return '$module:logger';
+    return '$service:logger';
   }
 
   void info(msg, {String? module, LokiLabel? labels}) =>
@@ -47,10 +48,11 @@ class Logger extends Equatable {
       _print(msg, Level.debug, module, {_level: Level.debug.toString(), ...?labels});
 
   void _print(msg, Level level, [String? module, LokiLabel? labels]) {
-    final log = ansiPrint(msg, level: level, module: module ?? this.module, options: options);
-    Tuple3<List<String>, String, LokiLabel?>? val;
+    module ??= defaultModule;
+    final log = ansiPrint(msg, level: level, service: service, module: module, options: options);
+    PushIsolateMessage? val;
     void send() {
-      val ??= Tuple3([log], module ?? this.module ?? Platform.localHostname, labels);
+      val ??= PushIsolateMessage([log], service ?? Platform.localHostname, module, labels);
       _sendPorts[lokiOptions!]!.send(val);
     }
 
@@ -58,7 +60,7 @@ class Logger extends Equatable {
       try {
         send();
       } catch (_) {
-        final logger = Logger(module: _loggerModuleName, options: options);
+        final logger = Logger(service: _loggerServiceName, options: options);
         logger.warn('Loki is not yet active or disposed.');
         logger.warn('Trying to restart it');
         try {
@@ -73,7 +75,7 @@ class Logger extends Equatable {
 
   Future<void> startLoki() async {
     if (!lokiEnabled) {
-      Logger(module: _loggerModuleName, options: options).warn('Loki URL not configured');
+      Logger(service: _loggerServiceName, options: options).warn('Loki URL not configured');
       return;
     }
     final receiverPort = ReceivePort();
@@ -94,13 +96,14 @@ class Logger extends Equatable {
     _sendPorts[lokiOptions!]!.send('exit');
   }
 
-  Logger copyWith({String? module, LoggerOptions? options, LokiOptions? lokiOptions}) => Logger(
-      module: module ?? this.module,
+  Logger copyWith({String? service, String? defaultModule, LoggerOptions? options, LokiOptions? lokiOptions}) => Logger(
+      service: service ?? this.service,
+      defaultModule: defaultModule ?? this.defaultModule,
       options: options ?? this.options,
       lokiOptions: lokiOptions ?? this.lokiOptions);
 
   @override
-  List<Object?> get props => [module, options, lokiOptions];
+  List<Object?> get props => [service, defaultModule, options, lokiOptions];
 
   @override
   bool? get stringify => true;

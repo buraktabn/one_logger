@@ -9,6 +9,9 @@ import 'package:tuple/tuple.dart';
 
 import '../logger.dart';
 
+// [log], service, module?, label?
+typedef PushIsolateMessage = Tuple4<List<String>, String, String?, LokiLabel?>;
+
 void pushIsolate(Tuple2<SendPort, LokiOptions> payload) {
   final receivePort = ReceivePort();
   payload.item1.send(receivePort.sendPort);
@@ -32,9 +35,9 @@ void pushIsolate(Tuple2<SendPort, LokiOptions> payload) {
       Isolate.exit();
     }
     try {
-      final msg = val as Tuple3<List<String>, String, LokiLabel?>;
-      final pushPayload =
-          PushPayload(streams: {'service': msg.item2, ...?msg.item3}, logs: msg.item1);
+      final msg = val as PushIsolateMessage;
+      final pushPayload = PushPayload(
+          streams: {'service': msg.item2, ...?msg.item4, if (msg.item3 != null) 'module': msg.item3!}, logs: msg.item1);
       jobs.add(pushPayload);
       if (lokiOptions.batchEvery != null) {
         return;
@@ -97,7 +100,7 @@ class PushPayload extends Equatable {
     final values = <List<String>>[];
     for (final log in logs) {
       final split = log.split(']');
-      final date = dateFormat.parse(split.first.split('[').last).toUtc().millisecondsSinceEpoch;
+      final date = defaultDateFormat.parse(split.first.split('[').last).toUtc().millisecondsSinceEpoch;
       values.add(["${date}000000", split.sublist(1).join(']').trim()]);
     }
     return values;
