@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:one_logger/src/options/options.dart';
 import 'package:one_logger/src/options/style.dart';
+
 // import 'support/support_ansi.dart'
 //     if (dart.library.io) 'support/support_ansi_io.dart'
 //     if (dart.library.html) 'support/support_ansi_web.dart';
@@ -20,13 +21,16 @@ String textToAnsi(text, {LogStyle style = const LogStyle()}) {
   return '\x1B[${style.attr.index}$fg${bg}m$text\x1B[0m';
 }
 
-String ansiPrint(msg,
-    {DateTime? date,
-    Level level = Level.debug,
-    String? service,
-    String? module,
-      DateFormat? dateFormat,
-    LoggerOptions options = defaultLevelOptions}) {
+String ansiPrint(
+  msg, {
+  DateTime? date,
+  Level level = Level.debug,
+  String? service,
+  String? module,
+  DateFormat? dateFormat,
+  LoggerOptions options = defaultLevelOptions,
+  bool shouldPrint = true,
+}) {
   service ??= Platform.localHostname;
   dateFormat ??= defaultDateFormat;
   date ??= DateTime.now();
@@ -36,7 +40,7 @@ String ansiPrint(msg,
   final levelStyle = level.logStyleFromOptions(options);
   final mLevel = textToAnsi(levelStyle.item1, style: levelStyle.item2);
   final log = '$mDate $mLevel $mService$mModule $msg';
-  print(log);
+  if (shouldPrint) print(log);
   return log;
   // date, level, module, msg
 }

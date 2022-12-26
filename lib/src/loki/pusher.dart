@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:one_logger/src/helper.dart';
 import 'package:one_logger/src/loki/options.dart';
+import 'package:one_logger/src/options/options.dart';
 import 'package:tuple/tuple.dart';
 
 import '../logger.dart';
@@ -12,15 +13,21 @@ import '../logger.dart';
 // [log], service, module?, label?
 typedef PushIsolateMessage = Tuple4<List<String>, String, String?, LokiLabel?>;
 
-void pushIsolate(Tuple2<SendPort, LokiOptions> payload) {
+void pushIsolate(Tuple4<SendPort, LokiOptions, String?, LoggerOptions> payload) {
+  final logger = Logger(service: payload.item3, options: payload.item4, defaultModule: 'loki-push');
   final receivePort = ReceivePort();
   payload.item1.send(receivePort.sendPort);
   final lokiOptions = payload.item2;
   final jobs = <PushPayload>[];
 
+  Timer? timer;
+
   if (lokiOptions.batchEvery != null) {
-    Timer.periodic(lokiOptions.batchEvery!, (_) async {
+    timer = Timer.periodic(lokiOptions.batchEvery!, (_) async {
       final mJobs = [...jobs];
+      if (mJobs.isEmpty) {
+        return;
+      }
       await _pushBatch(lokiOptions.lokiUrl, mJobs);
       for (final r in mJobs) {
         jobs.remove(r);
@@ -28,11 +35,19 @@ void pushIsolate(Tuple2<SendPort, LokiOptions> payload) {
     });
   }
   receivePort.listen((val) async {
-    if (val == 'exit') {
-      do {
-        await Future.delayed(const Duration(milliseconds: 100));
-      } while (jobs.isNotEmpty);
-      Isolate.exit();
+    if (val == 'exit' || val == 'done') {
+      if (lokiOptions.batchEvery != null) {
+        while (jobs.isNotEmpty) {
+          logger.debug('Waiting ${jobs.length} unfinished jobs to exit');
+          await Future.delayed(Duration(milliseconds: lokiOptions.batchEvery!.inMilliseconds ~/ 2));
+        }
+        timer!.cancel();
+      }
+      if (val != 'done') payload.item1.send('done');
+      return;
+      // do {
+      //   await Future.delayed(const Duration(milliseconds: 100));
+      // } while (jobs.isNotEmpty);
     }
     try {
       final msg = val as PushIsolateMessage;
@@ -44,7 +59,8 @@ void pushIsolate(Tuple2<SendPort, LokiOptions> payload) {
       }
       await _push(lokiOptions.lokiUrl, pushPayload);
       jobs.remove(pushPayload);
-    } catch (_) {
+    } catch (err, st) {
+      Logger().error('val: $val, $err', stackTrace: st, module: 'loki-push');
       // --jobs;
     }
   });

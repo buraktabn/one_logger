@@ -1,3 +1,8 @@
+## 1.0.4
+
+- Introduced `LoggerFilter`. Now logs can be filtered by `Level`
+- Improved batching functionality.
+
 ## 1.0.3
 
 - Introduced `service` and `module`
