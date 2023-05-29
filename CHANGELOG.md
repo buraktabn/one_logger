@@ -1,3 +1,7 @@
+## 1.0.9
+
+- Updated `README.md`.
+
 ## 1.0.8
 
 - Added `bool enableAnsi` to `LoggerOptions`.

@@ -1,38 +1,62 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+## one_logger
+`one_logger` is a simple yet powerful logging package that outputs logs in a single line format `[date level module msg]`. With ANSI support, it enhances the readability of logs in your console.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+### Features
+- **Single line logging**: Each log is output in a single line, with a timestamp, log level, module, and message.
+- **ANSI support**: Logs are colored based on their log level, making them easier to distinguish in the console.
+- **Customizable**: Various options allow you to customize the logging behavior to suit your needs.
+- **[Loki Support](https://grafana.com/oss/loki/)**: Push logs to Loki.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-## Features
-
-Simple logger with ansi support.
-
-```
-[2022-10-27 02:58:28.172]  INFO blockchain: this is info
-[2022-10-27 02:58:28.191]  WARN blockchain: this is warn
-[2022-10-27 02:58:28.191] ERROR blockchain: this is error
-[2022-10-27 02:58:28.191] DEBUG blockchain: this is debug
-```
-
-## Usage
-
-nclude short and useful examples for package users. Add longer examples
-to `/example` folder. 
+### Usage
+First, create a `Logger` instance:
 
 ```dart
-const like = 'sample';
+const logger = Logger();
+```
+```dart
+const logger = Logger(
+    service: "your_service_name",
+    defaultModule: "default_module_name",
+    lokiOptions: LokiOptions(lokiUrl: "your_loki_url"),
+    options: LoggerOptions(),
+    filter: DevelopmentLoggerFilter(),
+);
+```
+If Loki is configured, call `startLoki()` before using the logger:
+
+```dart
+logger.startLoki();
+```
+And make sure to call `disposeLoki()` when you're done with the logger:
+
+```dart
+logger.disposeLoki();
 ```
 
-## Additional information
+You can then log messages using the `Logger` methods:
 
-Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+logger.trace("This is a trace log");
+logger.info("This is an info log");
+logger.warn("This is a warn log");
+logger.error("This is an error log");
+logger.debug("This is a debug log");
+```
+
+### Classes
+- `LokiOptions`: Configuration options for Loki, a horizontally-scalable, highly-available, multi-tenant log aggregation system.
+
+- `LoggerOptions`: Options for configuring the logger, including styles for each log level and whether to enable ANSI.
+
+- `LoggerFilter`: Abstract class representing a filter that determines whether a log of a particular level should be printed or pushed.
+
+- `DevelopmentLoggerFilter`: Logger filter suitable for development environments.
+
+- `ProductionLoggerFilter`: Logger filter suitable for production environments.
+
+- `Logger`: The main logger class. Provides methods for logging messages of different levels.
+
+- `ansiPrint`: Function to print a log with ANSI color codes.
+
+### Customization
+You can customize the logger's behavior by providing your own `LoggerOptions` and `LoggerFilter` when creating the `Logger`. This allows you to control aspects such as the colors of the logs, whether to enable ANSI, and which logs should be printed or pushed.
