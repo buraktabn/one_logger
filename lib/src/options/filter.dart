@@ -27,7 +27,7 @@ class ProductionLoggerFilter extends LoggerFilter {
 
   @override
   bool shouldPrintLog(Level level) {
-    return level == Level.info;
+    return level == Level.warn;
   }
 
   @override

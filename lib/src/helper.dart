@@ -12,10 +12,10 @@ const defaultLevelOptions = LoggerOptions();
 
 final defaultDateFormat = DateFormat('yyyy-MM-dd HH:mm:ss.S');
 
-String textToAnsi(text, {LogStyle style = const LogStyle()}) {
-  // if (!supportsAnsiColor) {
-  //   return text;
-  // }
+String textToAnsi(text, {LogStyle style = const LogStyle(), bool enableAnsi = true}) {
+  if (!enableAnsi) {
+    return text;
+  }
   final fg = style.textColor == null ? '' : ';${style.textColor}';
   final bg = style.backgroundColor == null ? '' : ';${style.backgroundColor}';
   return '\x1B[${style.attr.index}$fg${bg}m$text\x1B[0m';
@@ -34,11 +34,11 @@ String ansiPrint(
   service ??= Platform.localHostname;
   dateFormat ??= defaultDateFormat;
   date ??= DateTime.now();
-  final mService = textToAnsi(service, style: options.service);
-  final mModule = module == null ? '' : ':${textToAnsi(module, style: options.module)}';
-  final mDate = textToAnsi('[${dateFormat.format(date)}]', style: options.date);
+  final mService = textToAnsi(service, style: options.service, enableAnsi: options.enableAnsi);
+  final mModule = module == null ? '' : ':${textToAnsi(module, style: options.module, enableAnsi: options.enableAnsi)}';
+  final mDate = textToAnsi('[${dateFormat.format(date)}]', style: options.date, enableAnsi: options.enableAnsi);
   final levelStyle = level.logStyleFromOptions(options);
-  final mLevel = textToAnsi(levelStyle.item1, style: levelStyle.item2);
+  final mLevel = textToAnsi(levelStyle.item1, style: levelStyle.item2, enableAnsi: options.enableAnsi);
   final log = '$mDate $mLevel $mService$mModule $msg';
   if (shouldPrint) print(log);
   return log;

@@ -40,6 +40,9 @@ class Logger extends Equatable {
     return '$service:logger';
   }
 
+  void trace(msg, {String? module, LokiLabel? labels}) =>
+      _print(msg, Level.trace, module, {_level: Level.trace.toString(), ...?labels});
+
   void info(msg, {String? module, LokiLabel? labels}) =>
       _print(msg, Level.info, module, {_level: Level.info.toString(), ...?labels});
 

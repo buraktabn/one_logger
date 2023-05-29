@@ -4,6 +4,7 @@ import 'package:tuple/tuple.dart';
 import 'style.dart';
 
 enum Level {
+  trace,
   info,
   warn,
   error,
@@ -33,6 +34,7 @@ enum Level {
 }
 
 class LoggerOptions extends Equatable {
+  final LogStyle trace;
   final LogStyle info;
   final LogStyle warn;
   final LogStyle error;
@@ -40,8 +42,10 @@ class LoggerOptions extends Equatable {
   final LogStyle module;
   final LogStyle service;
   final LogStyle date;
+  final bool enableAnsi;
 
   const LoggerOptions({
+    this.trace = const LogStyle(),
     this.info = const LogStyle(textColor: textColorGreen),
     this.warn = const LogStyle(textColor: textColorMagenta),
     this.error = const LogStyle(textColor: textColorRed, attr: Attribute.reverse),
@@ -49,10 +53,12 @@ class LoggerOptions extends Equatable {
     this.module = const LogStyle(textColor: textColorCyan),
     this.service = const LogStyle(textColor: textColorCyan),
     this.date = const LogStyle(attr: Attribute.dim),
+    this.enableAnsi = true,
   });
 
   Map<Level, LogStyle> toLevelMap() {
     return {
+      Level.trace: trace,
       Level.info: info,
       Level.warn: warn,
       Level.error: error,
@@ -61,7 +67,7 @@ class LoggerOptions extends Equatable {
   }
 
   @override
-  List<Object?> get props => [info, warn, error, debug, module, service, date];
+  List<Object?> get props => [trace, info, warn, error, debug, module, service, date, enableAnsi];
 
   @override
   bool? get stringify => true;
