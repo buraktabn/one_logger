@@ -1,6 +1,9 @@
 ## one_logger
 `one_logger` is a simple yet powerful logging package that outputs logs in a single line format `[date level module msg]`. With ANSI support, it enhances the readability of logs in your console.
 
+**[example/simple_logger_example.dart:](https://github.com/buraktabn/one_logger/blob/main/example/simple_logger_example.dart)**
+![Output from examples/simple_logger_example.dart](https://github.com/buraktabn/one_logger/blob/main/images/simple_logger_example.png?raw=true "Example output")
+
 ### Features
 - **Single line logging**: Each log is output in a single line, with a timestamp, log level, module, and message.
 - **ANSI support**: Logs are colored based on their log level, making them easier to distinguish in the console.

@@ -1,3 +1,9 @@
+## 1.0.12
+
+- Updated packages
+- Updated examples and added new [loki example](https://github.com/buraktabn/one_logger/blob/main/example/loki_example.dart).
+- Updated `README.md`.
+
 ## 1.0.11
 
 - Changed `onLog`'s param to `(String log, Level level, String? module, LokiLabel? labels)`.
