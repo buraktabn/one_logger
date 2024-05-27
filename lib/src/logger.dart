@@ -11,6 +11,7 @@ import 'helper.dart';
 import 'options/options.dart';
 
 typedef LokiLabel = Map<String, String>;
+typedef OnLogParams = (String log, Level level, String? module, LokiLabel? labels);
 
 const _level = 'level';
 
@@ -23,6 +24,7 @@ class Logger extends Equatable {
     this.lokiOptions,
     this.options = defaultLevelOptions,
     this.filter,
+    this.onLog,
   });
 
   final String? service;
@@ -30,6 +32,7 @@ class Logger extends Equatable {
   final LokiOptions? lokiOptions;
   final LoggerOptions options;
   final LoggerFilter? filter;
+  final Function(OnLogParams)? onLog;
 
   bool get lokiEnabled => lokiOptions != null;
 
@@ -67,6 +70,7 @@ class Logger extends Equatable {
         module: module,
         options: options,
         shouldPrint: filter?.shouldPrintLog(level) ?? true);
+    onLog?.call((log, level, module, labels));
     PushIsolateMessage? val;
     void send() {
       val ??= PushIsolateMessage([log], service ?? Platform.localHostname, module, labels);

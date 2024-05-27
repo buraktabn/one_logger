@@ -20,6 +20,7 @@ const logger = Logger(
     lokiOptions: LokiOptions(lokiUrl: "your_loki_url"),
     options: LoggerOptions(),
     filter: DevelopmentLoggerFilter(),
+    // onLog: (params) { }, // Called when something logged
 );
 ```
 If Loki is configured, call `startLoki()` before using the logger:

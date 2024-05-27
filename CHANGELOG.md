@@ -1,3 +1,11 @@
+## 1.0.11
+
+- Changed `onLog`'s param to `(String log, Level level, String? module, LokiLabel? labels)`.
+
+## 1.0.10
+
+- Introduced `Function(String log)? onLog` callback to called when something logged.
+
 ## 1.0.9
 
 - Updated `README.md`.
